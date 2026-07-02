@@ -6,9 +6,11 @@ interface AuthState {
   user: User | null
 }
 
+const storedUser = localStorage.getItem('user')
+
 const initialState: AuthState = {
-  token: localStorage.getItem('token'), // ambil token lama kalau ada
-  user: null,
+  token: localStorage.getItem('token'),
+  user: storedUser ? JSON.parse(storedUser) : null,
 }
 
 const authSlice = createSlice({
@@ -18,12 +20,14 @@ const authSlice = createSlice({
     setCredentials: (state, action: PayloadAction<{ token: string; user: User }>) => {
       state.token = action.payload.token
       state.user = action.payload.user
-      localStorage.setItem('token', action.payload.token) // simpan biar tak hilang saat refresh
+      localStorage.setItem('token', action.payload.token)
+      localStorage.setItem('user', JSON.stringify(action.payload.user))
     },
     logout: (state) => {
       state.token = null
       state.user = null
       localStorage.removeItem('token')
+      localStorage.removeItem('user')
     },
   },
 })
