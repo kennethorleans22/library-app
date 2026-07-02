@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { useBookDetail } from '@/features/books/useBookDetail'
+import ReviewSection from '@/components/books/ReviewSection'
 
 function BookDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -8,9 +9,11 @@ function BookDetailPage() {
   if (isLoading) {
     return <p className="mx-auto max-w-[1200px] p-xl text-body-md text-neutral-500">Memuat...</p>
   }
+
   if (isError) {
     return <p className="mx-auto max-w-[1200px] p-xl text-body-md text-danger">Error: {error.message}</p>
   }
+
   if (!data) return null
 
   const book = data.data
@@ -23,12 +26,16 @@ function BookDetailPage() {
   ]
 
   return (
-    <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 pb-28 pt-xl tracking-[-0.02em] lg:px-8 md:pb-8">
+    <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 pb-28 pt-xl tracking-[-0.02em] md:pb-8 lg:px-8">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1 text-body-sm font-semibold">
-        <Link to="/" className="text-primary-500">Home</Link>
+        <Link to="/" className="text-primary-500">
+          Home
+        </Link>
         <img src="/icons/chevron-down.svg" alt="" className="h-4 w-4 -rotate-90" />
-        <Link to="/category" className="text-primary-500">Category</Link>
+        <Link to="/category" className="text-primary-500">
+          Category
+        </Link>
         <img src="/icons/chevron-down.svg" alt="" className="h-4 w-4 -rotate-90" />
         <span className="line-clamp-1 text-neutral-950">{book.title}</span>
       </nav>
@@ -37,11 +44,7 @@ function BookDetailPage() {
       <div className="flex flex-col items-center gap-9 md:flex-row md:items-start">
         {/* Cover */}
         <div className="w-[222px] shrink-0 bg-neutral-200 p-1.5 md:w-[337px] md:p-2">
-          <img
-            src={book.coverImage}
-            alt={book.title}
-            className="aspect-[2/3] w-full object-cover"
-          />
+          <img src={book.coverImage} alt={book.title} className="aspect-[2/3] w-full object-cover" />
         </div>
 
         {/* Info */}
@@ -50,12 +53,15 @@ function BookDetailPage() {
             <span className="inline-flex w-fit items-center rounded-sm border border-neutral-300 px-2 text-body-sm font-bold text-neutral-950">
               {book.category.name}
             </span>
+
             <h1 className="text-display-xs font-bold text-neutral-950 md:text-display-sm">
               {book.title}
             </h1>
+
             <p className="text-body-sm font-semibold text-neutral-700 md:text-body-md">
               {book.author.name}
             </p>
+
             <div className="flex items-center gap-0.5">
               <img src="/icons/star.svg" alt="" className="h-6 w-6" />
               <span className="text-body-md font-bold text-neutral-900">
@@ -64,26 +70,34 @@ function BookDetailPage() {
             </div>
           </div>
 
-                 {/* Stats */}
-          <div className="flex w-full items-stretch">
+          {/* Stats */}
+          <div className="flex h-[62px] w-full items-center gap-2xl md:h-[66px]">
             {stats.map((stat, index) => (
-              <div
-                key={stat.label}
-                className={`flex flex-1 flex-col md:w-[102px] md:flex-none ${
-                  index > 0 ? 'border-l border-neutral-300 pl-5' : ''
-                }`}
-              >
-                <span className="text-body-lg font-bold text-neutral-950 md:text-display-xs">
-                  {stat.value}
-                </span>
-                <span className="text-body-md font-medium text-neutral-950">
-                  {stat.label}
-                </span>
+              <div key={stat.label} className="contents">
+                {index > 0 && <div className="h-[62px] w-px shrink-0 bg-neutral-300 md:h-[66px]" />}
+
+                <div
+                  className={`flex min-w-0 flex-1 flex-col items-start md:h-[66px] md:w-[102px] md:flex-none ${
+                    index === 0 ? 'h-[62px]' : 'h-[60px]'
+                  }`}
+                >
+                  <span className="w-full text-body-lg font-bold tracking-[-0.03em] text-neutral-950 md:text-display-xs md:tracking-normal">
+                    {stat.value}
+                  </span>
+                  <span
+                    className={`w-full font-medium tracking-[-0.03em] text-neutral-950 md:text-body-md ${
+                      index === 0 ? 'text-body-md' : 'text-body-sm'
+                    }`}
+                  >
+                    {stat.label}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
 
-          <hr className="border-neutral-300" />
+          {/* Line 3 */}
+          <hr className="w-full border-neutral-300 md:w-[559px]" />
 
           {/* Description */}
           <div className="flex flex-col gap-1">
@@ -93,7 +107,7 @@ function BookDetailPage() {
             </p>
           </div>
 
-          {/* Tombol (desktop, inline) */}
+          {/* Tombol desktop */}
           <div className="hidden gap-3 md:flex">
             <button
               onClick={() => console.log('Add to cart:', book.id)}
@@ -112,7 +126,11 @@ function BookDetailPage() {
         </div>
       </div>
 
-      {/* Tombol (mobile, floating di bawah) */}
+      {/* Line 4 */}
+      <hr className="-mx-4 w-[calc(100%+32px)] border-neutral-300 lg:-mx-8 lg:w-[calc(100%+64px)] xl:mx-0 xl:w-[1200px]" />
+      {/* Review */}
+      <ReviewSection bookId={book.id} rating={book.rating} reviewCount={book.reviewCount} />
+      {/* Tombol mobile */}
       <div className="fixed inset-x-0 bottom-0 z-40 flex gap-3 bg-white p-4 shadow-[0px_0px_20px_rgba(203,202,202,0.25)] md:hidden">
         <button
           onClick={() => console.log('Add to cart:', book.id)}
