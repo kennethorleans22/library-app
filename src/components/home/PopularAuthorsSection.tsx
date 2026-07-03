@@ -1,4 +1,5 @@
 import { usePopularAuthors } from '@/features/authors/usePopularAuthors'
+import { Link } from 'react-router-dom'
 
 function PopularAuthorsSection() {
   const { data, isLoading, isError, error } = usePopularAuthors()
@@ -22,9 +23,10 @@ function PopularAuthorsSection() {
 
           {authors.length > 0 && (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-4 md:gap-5">
-              {authors.map((author) => (
-                <div
+                          {authors.map((author) => (
+                <Link
                   key={author.id}
+                  to={`/authors/${author.id}`}
                   className="flex items-center gap-3 rounded-xl bg-white p-3 shadow-[0px_0px_20px_rgba(203,202,202,0.25)] md:gap-4 md:p-4"
                 >
                   <img
@@ -43,7 +45,7 @@ function PopularAuthorsSection() {
                       </span>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

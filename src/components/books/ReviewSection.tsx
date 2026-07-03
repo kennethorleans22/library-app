@@ -17,18 +17,19 @@ function formatReviewDate(iso: string) {
 
 function ReviewCard({ review }: { review: Review }) {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl bg-white p-4 shadow-lg shadow-neutral-200/50">
-      <div className="flex items-center gap-3">
+    <div className="flex w-full min-w-0 flex-col gap-4 rounded-2xl bg-white p-4 shadow-lg shadow-neutral-200/50">
+      <div className="flex min-w-0 items-center gap-3">
         <img
           src="/avatar-placeholder.png"
           alt={review.user.name}
-          className="size-14.5 shrink-0 rounded-full object-cover lg:size-16"
+          className="h-14 w-14 shrink-0 rounded-full object-cover lg:h-16 lg:w-16"
         />
+
         <div className="flex min-w-0 flex-col">
           <p className="truncate text-body-sm font-bold text-neutral-950 lg:text-body-lg">
             {review.user.name}
           </p>
-          <p className="text-body-sm font-medium tracking-tight text-neutral-950 lg:text-body-md">
+          <p className="whitespace-nowrap text-body-sm font-medium tracking-tight text-neutral-950 lg:text-body-md">
             {formatReviewDate(review.createdAt)}
           </p>
         </div>
@@ -41,10 +42,11 @@ function ReviewCard({ review }: { review: Review }) {
               key={index}
               src="/icons/star.svg"
               alt=""
-              className={`size-6 ${index < review.star ? '' : 'opacity-30 grayscale'}`}
+              className={`h-6 w-6 ${index < review.star ? '' : 'opacity-30 grayscale'}`}
             />
           ))}
         </div>
+
         <p className="text-body-sm font-semibold text-neutral-950 lg:text-body-md">
           {review.comment}
         </p>
@@ -73,14 +75,15 @@ function ReviewSection({ bookId, rating, reviewCount }: ReviewSectionProps) {
   const reviews = data?.pages.flatMap((page) => page.data.reviews) ?? []
 
   return (
-    <section className="flex w-full flex-col items-center gap-4.5 tracking-tight">
+    <section className="flex w-full flex-col gap-4 tracking-tight">
       <div className="flex w-full flex-col gap-1 lg:gap-3">
         <h2 className="text-display-xs font-bold text-neutral-950 lg:text-display-lg">
           Review
         </h2>
+
         <div className="flex items-center gap-1">
-          <img src="/icons/star.svg" alt="" className="size-6 lg:size-8.5" />
-          <span className="text-body-md font-bold text-neutral-950 lg:text-body-xl">
+          <img src="/icons/star.svg" alt="" className="h-6 w-6 lg:h-8 lg:w-8" />
+          <span className="whitespace-nowrap text-body-md font-bold text-neutral-950 lg:text-body-xl">
             {rating.toFixed(1)} ({reviewCount} Ulasan)
           </span>
         </div>
@@ -95,7 +98,7 @@ function ReviewSection({ bookId, rating, reviewCount }: ReviewSectionProps) {
       )}
 
       {reviews.length > 0 && (
-        <div className="grid w-full grid-cols-1 items-start gap-4.5 md:grid-cols-2 md:gap-5 lg:items-stretch">
+        <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-5">
           {reviews.map((review) => (
             <ReviewCard key={review.id} review={review} />
           ))}
@@ -106,7 +109,7 @@ function ReviewSection({ bookId, rating, reviewCount }: ReviewSectionProps) {
         <button
           onClick={() => fetchNextPage()}
           disabled={isFetchingNextPage}
-          className="flex h-10 w-37.5 items-center justify-center rounded-full border border-neutral-300 text-body-sm font-bold text-neutral-950 disabled:opacity-60 lg:h-12 lg:w-50 lg:text-body-md"
+          className="mx-auto flex h-10 w-37.5 items-center justify-center rounded-full border border-neutral-300 text-body-sm font-bold text-neutral-950 disabled:opacity-60 lg:h-12 lg:w-50 lg:text-body-md"
         >
           {isFetchingNextPage ? 'Loading...' : 'Load More'}
         </button>

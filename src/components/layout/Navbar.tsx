@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAppSelector, useAppDispatch } from '@/app/hooks'
 import { logout } from '@/features/auth/authSlice'
 import { setSearch } from '@/features/ui/uiSlice'
+import { useCart } from '@/features/cart/useCart'
 
 function Navbar() {
   const token = useAppSelector((s) => s.auth.token)
@@ -16,7 +17,8 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
 
-  const cartCount = 0 // TODO: sambungkan ke cart nanti
+  const { data: cartData } = useCart()
+  const cartCount = cartData?.data.items.length ?? 0
 
   const handleLogout = () => {
     dispatch(logout())
@@ -80,14 +82,14 @@ function Navbar() {
                   <img src="/icons/search.svg" alt="Search" className="h-6 w-6" />
                 </button>
 
-                <button className="relative">
+                             <Link to="/cart" className="relative">
                   <img src="/icons/cart.svg" alt="Cart" className="h-7 w-7 md:h-8 md:w-8" />
                   {cartCount > 0 && (
                     <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-danger text-body-xs font-bold text-white">
                       {cartCount}
                     </span>
                   )}
-                </button>
+                </Link>
 
                 <div className="relative">
                   <button onClick={() => setMenuOpen((o) => !o)} className="flex items-center gap-md">
@@ -124,7 +126,7 @@ function Navbar() {
             ) : (
               <>
                 {/* Belum login — MOBILE */}
-                <div className="flex items-center gap-xl md:hidden">
+               <div className="flex items-center gap-xl lg:hidden">
                   <button onClick={() => setSearchOpen(true)}>
                     <img src="/icons/search.svg" alt="Search" className="h-6 w-6" />
                   </button>
@@ -142,7 +144,7 @@ function Navbar() {
                 </div>
 
                 {/* Belum login — DESKTOP */}
-                <div className="hidden items-center gap-xl md:flex">
+              <div className="hidden items-center gap-xl lg:flex">
                   <Link
                     to="/login"
                     className="flex h-12 w-[163px] items-center justify-center rounded-full border border-neutral-300 text-body-md font-bold text-neutral-950"
@@ -164,7 +166,7 @@ function Navbar() {
 
       {/* Menu hamburger (mobile, belum login) */}
       {menuOpen && !isLoggedIn && (
-        <div className="flex flex-col gap-md border-t border-neutral-200 px-4 py-lg md:hidden">
+    <div className="flex flex-col gap-md border-t border-neutral-200 px-4 py-lg lg:hidden">
           <Link
             to="/login"
             onClick={() => setMenuOpen(false)}

@@ -4,16 +4,21 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import BookListPage from './pages/BookListPage'
 import BookDetailPage from './pages/BookDetailPage'
+import CategoryPage from './pages/CategoryPage'
+import AuthorBooksPage from './pages/AuthorBooksPage'
+import CartPage from './pages/CartPage'
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-
       <Route element={<Layout />}>
         <Route path="/" element={<BookListPage />} />
+        <Route path="/category" element={<CategoryPage />} />
         <Route path="/books/:id" element={<BookDetailPage />} />
+        <Route path="/authors/:id" element={<AuthorBooksPage />} />
+                <Route path="/cart" element={<CartPage />} />
       </Route>
     </Routes>
   )
