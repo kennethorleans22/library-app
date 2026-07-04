@@ -11,6 +11,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import BorrowSuccessPage from './pages/BorrowSuccessPage';
 import LoansPage from './pages/LoansPage';
 import ProfilePage from './pages/ProfilePage';
+import ReviewsPage from './pages/ReviewsPage';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path='/borrow-success' element={<BorrowSuccessPage />} />
         <Route path='/loans' element={<LoansPage />} />
         <Route path='/profile' element={<ProfilePage />} />
+        <Route path='/reviews' element={<ReviewsPage />} />
       </Route>
     </Routes>
   );
