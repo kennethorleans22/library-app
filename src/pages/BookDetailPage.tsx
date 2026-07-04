@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useBookDetail } from '@/features/books/useBookDetail';
 import ReviewSection from '@/components/books/ReviewSection';
 import RelatedBooksSection from '@/components/books/RelatedBooksSection';
@@ -8,6 +8,7 @@ function BookDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, isError, error } = useBookDetail(id);
   const addToCart = useAddToCart();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -30,6 +31,14 @@ function BookDetailPage() {
   const book = data.data;
   const outOfStock = book.availableCopies <= 0;
 
+  const handleBorrow = async () => {
+    try {
+      await addToCart.mutateAsync(book.id); // pastikan buku ada di cart dulu
+    } catch {
+      // kemungkinan buku sudah ada di cart — abaikan, tetap lanjut ke checkout
+    }
+    navigate('/checkout', { state: { bookId: book.id } });
+  };
   const stats = [
     { value: book.availableCopies, label: 'Stock' },
     { value: book.rating.toFixed(1), label: 'Rating' },
@@ -147,8 +156,8 @@ function BookDetailPage() {
               Add to Cart
             </button>
             <button
-              onClick={() => console.log('Borrow:', book.id)}
-              disabled={outOfStock}
+                         onClick={handleBorrow}
+              disabled={outOfStock || addToCart.isPending}
               className='flex h-12 w-[200px] items-center justify-center rounded-full bg-primary-500 text-body-md font-bold text-neutral-25 disabled:opacity-60'
             >
               {outOfStock ? 'Out of Stock' : 'Borrow Book'}
