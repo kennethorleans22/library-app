@@ -1,28 +1,27 @@
-export const BASE_URL = 'https://library-backend-production-b9cf.up.railway.app'
+export const BASE_URL = "https://library-backend-production-b9cf.up.railway.app";
 
-// Bungkus fetch: otomatis pasang alamat server, header,
-// dan lempar error kalau server menjawab gagal.
+// Bungkus fetch: pasang alamat server, header, dan lempar error kalau gagal.
 export async function apiFetch<T>(
   path: string,
-  options: RequestInit = {},
+  options: RequestInit = {}
 ): Promise<T> {
-  const token = localStorage.getItem('token')
-  const isFormData = options.body instanceof FormData
+  const token = localStorage.getItem("token");
+  const isFormData = options.body instanceof FormData;
 
   const response = await fetch(`${BASE_URL}${path}`, {
     ...options,
     headers: {
-      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+      // Kalau kirim FormData (upload file), JANGAN set Content-Type —
+      // biar browser menaruh boundary multipart sendiri.
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
-  })
+  });
 
-  const json = await response.json()
-
+  const json = await response.json();
   if (!response.ok) {
-    throw new Error(json.message || 'Terjadi kesalahan pada server')
+    throw new Error(json.message || "Terjadi kesalahan pada server");
   }
-
-  return json as T
+  return json as T;
 }

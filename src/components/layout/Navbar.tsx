@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type KeyboardEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { logout } from '@/features/auth/authSlice'
@@ -32,6 +32,12 @@ function Navbar() {
     navigate('/login')
   }
 
+    const handleSearchEnter = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== 'Enter') return
+    navigate('/category') // Redux ui.search sudah terisi → CategoryPage otomatis pakai untuk filter
+    setSearchOpen(false)
+  }
+
   return (
     <header className="sticky top-0 z-50 bg-white shadow-card">
       <div className="relative mx-auto flex h-16 max-w-300 items-center justify-between gap-xl px-4 lg:h-20 lg:px-8">
@@ -43,11 +49,12 @@ function Navbar() {
 
             <div className="flex h-10 flex-1 items-center gap-1.5 rounded-full border border-neutral-300 px-lg">
               <img src="/icons/search.svg" alt="" className="size-5" />
-              <input
+                       <input
                 autoFocus
                 type="text"
                 value={search}
                 onChange={(event) => dispatch(setSearch(event.target.value))}
+                onKeyDown={handleSearchEnter}
                 placeholder="Search book"
                 className="min-w-0 flex-1 text-body-sm font-medium text-neutral-950 outline-none placeholder:text-neutral-600"
               />
@@ -73,10 +80,11 @@ function Navbar() {
             {isLoggedIn && (
               <div className="hidden h-11 w-125 items-center gap-1.5 rounded-full border border-neutral-300 px-xl lg:flex">
                 <img src="/icons/search.svg" alt="" className="size-5" />
-                <input
+                               <input
                   type="text"
                   value={search}
                   onChange={(event) => dispatch(setSearch(event.target.value))}
+                  onKeyDown={handleSearchEnter}
                   placeholder="Search book"
                   className="min-w-0 flex-1 text-body-sm font-medium text-neutral-950 outline-none placeholder:text-neutral-600"
                 />
