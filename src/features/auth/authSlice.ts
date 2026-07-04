@@ -23,6 +23,7 @@ const authSlice = createSlice({
       localStorage.setItem('token', action.payload.token)
       localStorage.setItem('user', JSON.stringify(action.payload.user))
     },
+
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (!state.user) return
 
@@ -33,6 +34,7 @@ const authSlice = createSlice({
 
       localStorage.setItem('user', JSON.stringify(state.user))
     },
+
     logout: (state) => {
       state.token = null
       state.user = null

@@ -3,6 +3,11 @@ import { Camera } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { updateUser } from '@/features/auth/authSlice'
+import {
+  getProfileFromUpdateResponse,
+  useMyProfile,
+  useUpdateMyProfile,
+} from '@/features/profile/useMyProfile'
 
 const tabs = [
   { label: 'Profile', to: '/profile' },
@@ -17,18 +22,19 @@ type ProfileForm = {
   profilePhoto: string
 }
 
-const fields = [
-  { label: 'Name', key: 'name', type: 'text' },
-  { label: 'Email', key: 'email', type: 'email' },
-  { label: 'Nomor Handphone', key: 'phone', type: 'tel' },
-] as const
-
 function ProfilePage() {
   const dispatch = useAppDispatch()
   const user = useAppSelector((state) => state.auth.user)
+
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { data: profileResponse, isLoading } = useMyProfile()
+  const updateProfileMutation = useUpdateMyProfile()
+
+  const serverProfile = profileResponse?.data.profile
+  const profile = serverProfile ?? user
 
   const [isEditing, setIsEditing] = useState(false)
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [form, setForm] = useState<ProfileForm>({
     name: '',
     email: '',
@@ -37,20 +43,26 @@ function ProfilePage() {
   })
 
   useEffect(() => {
-    if (!user) return
+    if (!serverProfile) return
+
+    dispatch(updateUser(serverProfile))
+  }, [dispatch, serverProfile])
+
+  useEffect(() => {
+    if (!profile) return
 
     setForm({
-      name: user.name ?? '',
-      email: user.email ?? '',
-      phone: user.phone ?? '',
-      profilePhoto: user.profilePhoto ?? '',
+      name: profile.name ?? '',
+      email: profile.email ?? '',
+      phone: profile.phone ?? '',
+      profilePhoto: profile.profilePhoto ?? '',
     })
-  }, [user])
+  }, [profile])
 
   const rows = [
-    { label: 'Name', value: user?.name ?? '-' },
-    { label: 'Email', value: user?.email ?? '-' },
-    { label: 'Nomor Handphone', value: user?.phone ?? '-' },
+    { label: 'Name', value: profile?.name ?? '-' },
+    { label: 'Email', value: profile?.email ?? '-' },
+    { label: 'Nomor Handphone', value: profile?.phone ?? '-' },
   ]
 
   const handleInputChange =
@@ -64,6 +76,8 @@ function ProfilePage() {
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
+
+    setPhotoFile(file)
 
     const reader = new FileReader()
 
@@ -80,31 +94,33 @@ function ProfilePage() {
   }
 
   const handleCancel = () => {
-    if (user) {
+    if (profile) {
       setForm({
-        name: user.name ?? '',
-        email: user.email ?? '',
-        phone: user.phone ?? '',
-        profilePhoto: user.profilePhoto ?? '',
+        name: profile.name ?? '',
+        email: profile.email ?? '',
+        phone: profile.phone ?? '',
+        profilePhoto: profile.profilePhoto ?? '',
       })
     }
 
+    setPhotoFile(null)
     setIsEditing(false)
   }
 
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
+  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!user) return
+    if (!profile) return
 
-    dispatch(
-      updateUser({
-        name: form.name.trim() || user.name,
-        email: form.email.trim() || user.email,
-        phone: form.phone.trim() || user.phone,
-        profilePhoto: form.profilePhoto || user.profilePhoto,
-      }),
-    )
+    const response = await updateProfileMutation.mutateAsync({
+      name: form.name.trim(),
+      phone: form.phone.trim(),
+      profilePhoto: photoFile,
+    })
 
+    const updatedProfile = getProfileFromUpdateResponse(response.data)
+
+    dispatch(updateUser(updatedProfile))
+    setPhotoFile(null)
     setIsEditing(false)
   }
 
@@ -170,41 +186,78 @@ function ProfilePage() {
                 )}
               </div>
 
-              {isEditing
-                ? fields.map((field) => (
-                    <div
-                      key={field.key}
-                      className="flex min-h-8 items-center justify-between gap-6 lg:min-h-9"
+              {isEditing ? (
+                <>
+                  <div className="flex min-h-8 items-center justify-between gap-6 lg:min-h-9">
+                    <label
+                      htmlFor="name"
+                      className="text-body-sm font-medium tracking-figma-tighter text-neutral-950 lg:text-body-md"
                     >
-                      <label
-                        htmlFor={field.key}
-                        className="text-body-sm font-medium tracking-figma-tighter text-neutral-950 lg:text-body-md"
-                      >
-                        {field.label}
-                      </label>
+                      Name
+                    </label>
 
-                      <input
-                        id={field.key}
-                        type={field.type}
-                        value={form[field.key]}
-                        onChange={handleInputChange(field.key)}
-                        className="h-8 w-45 rounded-xl border border-neutral-300 px-3 text-right text-body-sm font-bold tracking-figma-tight text-neutral-950 outline-none focus:border-primary-500 lg:h-9 lg:w-80 lg:text-body-md"
-                      />
-                    </div>
-                  ))
-                : rows.map((row) => (
-                    <div
-                      key={row.label}
-                      className="flex h-7 items-center justify-between gap-6 lg:h-7.5"
+                    <input
+                      id="name"
+                      type="text"
+                      value={form.name}
+                      onChange={handleInputChange('name')}
+                      className="h-8 w-45 rounded-xl border border-neutral-300 px-3 text-right text-body-sm font-bold tracking-figma-tight text-neutral-950 outline-none focus:border-primary-500 lg:h-9 lg:w-80 lg:text-body-md"
+                    />
+                  </div>
+
+                  <div className="flex min-h-8 items-center justify-between gap-6 lg:min-h-9">
+                    <label
+                      htmlFor="email"
+                      className="text-body-sm font-medium tracking-figma-tighter text-neutral-950 lg:text-body-md"
                     >
-                      <span className="text-body-sm font-medium tracking-figma-tighter text-neutral-950 lg:text-body-md">
-                        {row.label}
-                      </span>
-                      <span className="max-w-45 truncate text-right text-body-sm font-bold tracking-figma-tight text-neutral-950 lg:max-w-80 lg:text-body-md">
-                        {row.value}
-                      </span>
-                    </div>
-                  ))}
+                      Email
+                    </label>
+
+                    <input
+                      id="email"
+                      type="email"
+                      value={form.email}
+                      disabled
+                      className="h-8 w-45 rounded-xl border border-neutral-300 bg-neutral-50 px-3 text-right text-body-sm font-bold tracking-figma-tight text-neutral-600 outline-none lg:h-9 lg:w-80 lg:text-body-md"
+                    />
+                  </div>
+
+                  <div className="flex min-h-8 items-center justify-between gap-6 lg:min-h-9">
+                    <label
+                      htmlFor="phone"
+                      className="text-body-sm font-medium tracking-figma-tighter text-neutral-950 lg:text-body-md"
+                    >
+                      Nomor Handphone
+                    </label>
+
+                    <input
+                      id="phone"
+                      type="tel"
+                      value={form.phone}
+                      onChange={handleInputChange('phone')}
+                      className="h-8 w-45 rounded-xl border border-neutral-300 px-3 text-right text-body-sm font-bold tracking-figma-tight text-neutral-950 outline-none focus:border-primary-500 lg:h-9 lg:w-80 lg:text-body-md"
+                    />
+                  </div>
+                </>
+              ) : isLoading ? (
+                <p className="text-body-sm font-medium text-neutral-600">
+                  Loading profile...
+                </p>
+              ) : (
+                rows.map((row) => (
+                  <div
+                    key={row.label}
+                    className="flex h-7 items-center justify-between gap-6 lg:h-7.5"
+                  >
+                    <span className="text-body-sm font-medium tracking-figma-tighter text-neutral-950 lg:text-body-md">
+                      {row.label}
+                    </span>
+                    <span className="max-w-45 truncate text-right text-body-sm font-bold tracking-figma-tight text-neutral-950 lg:max-w-80 lg:text-body-md">
+                      {row.value}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
 
             {isEditing ? (
@@ -219,9 +272,10 @@ function ProfilePage() {
 
                 <button
                   type="submit"
-                  className="flex h-11 items-center justify-center rounded-full bg-primary-500 text-body-md font-bold tracking-figma-tight text-neutral-25"
+                  disabled={updateProfileMutation.isPending}
+                  className="flex h-11 items-center justify-center rounded-full bg-primary-500 text-body-md font-bold tracking-figma-tight text-neutral-25 disabled:opacity-60"
                 >
-                  Save Profile
+                  {updateProfileMutation.isPending ? 'Saving...' : 'Save Profile'}
                 </button>
               </div>
             ) : (
