@@ -9,6 +9,8 @@ import AuthorBooksPage from './pages/AuthorBooksPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import BorrowSuccessPage from './pages/BorrowSuccessPage';
+import LoansPage from './pages/LoansPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
         <Route path='/cart' element={<CartPage />} />
         <Route path='/checkout' element={<CheckoutPage />} />
         <Route path='/borrow-success' element={<BorrowSuccessPage />} />
+        <Route path='/loans' element={<LoansPage />} />
+        <Route path='/profile' element={<ProfilePage />} />
       </Route>
     </Routes>
   );

@@ -34,6 +34,15 @@
   --color-accent-yellow: #fdb022;
   --color-danger: #ee1d52;
 
+    --color-status-active: #24a500;
+  --color-status-active-soft: rgb(36 165 0 / 0.05);
+  --color-danger-soft: rgb(238 29 82 / 0.1);
+
+  --shadow-card: 0px 0px 20px rgba(203, 202, 202, 0.25);
+
+  --tracking-figma-tight: -0.02em;
+  --tracking-figma-tighter: -0.03em;
+
   /* ===== TIPOGRAFI: Display ===== */
   --text-display-3xl: 60px;
   --text-display-3xl--line-height: 72px;
